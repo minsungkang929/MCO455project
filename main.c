@@ -1,2 +1,2 @@
 #include <stdio.h>
-43t
+cout << "enter the number: "
