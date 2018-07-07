@@ -25,7 +25,7 @@ int main(void)
 
 void lcd_print(unsigned char input[40])
 {
-  lcd_print("");
+  lcd_print("To activate your Alarm System CALL BLODGERS");
 }
                                                     
 void lcd_write(volatile unsigned char data)
