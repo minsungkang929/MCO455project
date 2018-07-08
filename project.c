@@ -26,6 +26,15 @@ void main(void)
 	LCD_ROWS=4;
 	LCD_COLS=16;
 	devices_init();
+	
+	screen_title(void);
+	
+	lcd_setcursor(0, 0);
+	lcd_print("To activate your");
+	lcd_setcursor(1, 2);
+	lcd_print("Alarm System");
+	lcd_setcursor(3, 2);
+	lcd_print("Call BLODGERS");
   
 }
 
