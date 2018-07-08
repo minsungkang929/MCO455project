@@ -12,10 +12,8 @@
  */
 
 // Function prototypes
-void screen_main_menu(void);
-void screen_alarm_status(unsigned char act);
-void screen_local_alarm(unsigned char act);
-void screen_zone_sensor_status(unsigned char[] act);
+void scr_title(void);
+void lcd_to_activate(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
@@ -30,71 +28,70 @@ void main(void)
 	LCD_COLS=16;
 	devices_init();
 	
-	screen_title(void);
+	scr_title();
+	lcd_to_activate();
+  
+}
+
+// function definitions
+void scr_title(void)
+{
+	scr_clear();		// clear screen
 	
+	scr_setcursor(1, 10);
+	scr_print("BLODGERS HOME MONITORING SYSTEM");
+	scr_setcursor(3, 35);
+	scr_print("MAIN MENU");
+	scr_setcursor(5, 20);
+	scr_print("1. ENABLE BURGLAR ALARM");
+	scr_setcursor(6, 20);
+	scr_print("2. RESET PASSWORD");
+	scr_setcursor(7, 20);
+	scr_print("3. RESET ALARM");
+	scr_setcursor(8, 20);
+	scr_print("4. DeACTIVATE ALARM");
+  
+	scr_setcursor(10, 20);
+	scr_print("Your Choice - ");
+  
+	scr_setcursor(12, 17);
+	scr_print("ALARM STATUS");
+	scr_setcursor(13, 17);
+	scr_print("DeACTIVATED");  // should be changed
+  
+	scr_setcursor(15, 17);
+	scr_print("Local Alarm");
+	scr_setcursor(16, 22);
+	scr_print("OFF");  // should be changed
+  
+	scr_setcursor(12, 40);
+	scr_print("ZONE Sensor STATUS");
+	scr_setcursor(14, 42);
+	scr_print("ZONE 1");
+	scr_setcursor(16, 42);
+	scr_print("ZONE 2");
+	scr_setcursor(17, 42);
+	scr_print("ZONE 3");
+	scr_setcursor(18, 42);
+	scr_print("ZONE 4");
+	scr_setcursor(19, 42);
+	scr_print("ZONE 5");
+	scr_setcursor(20, 42);
+	scr_print("ZONE 6");
+	scr_setcursor(21, 42);
+	scr_print("ZONE 7");
+	scr_setcursor(22, 42);
+	scr_print("ZONE 8");
+	
+	scr_setcursor(10, 35);
+}
+
+void lcd_to_activate(void)
+{
 	lcd_setcursor(0, 0);
 	lcd_print("To activate your");
 	lcd_setcursor(1, 2);
 	lcd_print("Alarm System");
 	lcd_setcursor(3, 2);
 	lcd_print("Call BLODGERS");
-  
-}
-
-// function definitions
-void screen_title(void)
-{
-	void scr_setcursor(1, 10);
-	void scr_print("BLODGERS HOME MONITORING SYSTEM");
-  void scr_setcursor(3, 35);
-  void scr_print("MAIN MENU");
-  void scr_setcursor(5, 20);
-  void scr_print("1. ENABLE BURGLAR ALARM");
-  void scr_setcursor(6, 20);
-  void scr_print("2. RESET PASSWORD");
-  void scr_setcursor(7, 20);
-  void scr_print("3. RESET ALARM");
-  void scr_setcursor(8, 20);
-  void scr_print("4. DeACTIVATE ALARM");
-  
-  void scr_setcursor(10, 20);
-  void scr_print("Your Choice ");
-}
- 
-void screen_alarm_status(unsigned char act)
-{
-  void scr_setcursor(12, 17);
-  void scr_print("ALARM STATUS");
-  void scr_setcursor(13, 17);
-  void scr_print("DeACTIVATED");  // should be changed
-}
-
-void screen_local_alarm(unsigned char act)
-{
-  void scr_setcursor(15, 17);
-  void scr_print("Local Alarm");
-  void scr_setcursor(16, 22);
-  void scr_print("OFF");  // should be changed
-}
-
-void screen_zone_sensor_status(unsigned char[] act)
-{
-  void scr_setcursor(12, 40);
-  void scr_print("ZONE Sensor STATUS");
-  void scr_setcursor(14, 42);
-  void scr_print("ZONE 1");
-  void scr_setcursor(16, 42);
-  void scr_print("ZONE 2");
-  void scr_setcursor(17, 42);
-  void scr_print("ZONE 3");
-  void scr_setcursor(18, 42);
-  void scr_print("ZONE 4");
-  void scr_setcursor(19, 42);
-  void scr_print("ZONE 5");
-  void scr_setcursor(20, 42);
-  void scr_print("ZONE 6");
-  void scr_setcursor(21, 42);
-  void scr_print("ZONE 7");
-  void scr_setcursor(22, 42);
-  void scr_print("ZONE 8");
 }
