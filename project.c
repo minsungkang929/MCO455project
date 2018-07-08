@@ -12,7 +12,10 @@
  */
 
 // Function prototypes
-void screen_title(void);
+void screen_main_menu(void);
+void screen_alarm_status(unsigned char act);
+void screen_local_alarm(unsigned char act);
+void screen_zone_sensor_status(unsigned char[] act);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
@@ -56,17 +59,26 @@ void screen_title(void)
   
   void scr_setcursor(10, 20);
   void scr_print("Your Choice ");
-  
+}
+ 
+void screen_alarm_status(unsigned char act)
+{
   void scr_setcursor(12, 17);
   void scr_print("ALARM STATUS");
   void scr_setcursor(13, 17);
   void scr_print("DeACTIVATED");  // should be changed
-  
+}
+
+void screen_local_alarm(unsigned char act)
+{
   void scr_setcursor(15, 17);
   void scr_print("Local Alarm");
   void scr_setcursor(16, 22);
   void scr_print("OFF");  // should be changed
-  
+}
+
+void screen_zone_sensor_status(unsigned char[] act)
+{
   void scr_setcursor(12, 40);
   void scr_print("ZONE Sensor STATUS");
   void scr_setcursor(14, 42);
