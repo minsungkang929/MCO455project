@@ -1,7 +1,7 @@
 /*
 	Title:		MCO Final Project - Burglar Alarm System
 	Author: 	Kang, Minsing (147175160) 
-                Kim, Kun Eui (144719168)
+                	Kim, Kun Eui (144719168)
 	Date: 		July ??, 2018
 	Description:	The program will emulate a BLODGERS HOME 
 					monitoring Burglar Alarm System. 
@@ -20,6 +20,7 @@ void lcd_alarm_off(void);
 void lcd_staring(void);
 void lcd_pls_close(void);
 void lcd_still_open(void);
+void lcd_all_closed(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
@@ -307,4 +308,42 @@ void lcd_still_open(void)
 			--ccount;
 		}
 	}
+}
+void lcd_all_closed(void)
+{
+	volatile unsigned char choice;
+	
+	lcd_setcursor(0, 2);
+	lcd_print("All Doors and");
+	lcd_setcursor(1, 3);
+	lcd_print("Windows are");
+	lcd_setcursor(3, 1);
+	lcd_print("closed.");
+	lcd_setcursor(0, 0);
+	lcd_print("KY3 = ARM, KY2 = cncl");
+	
+	do
+	{
+	switch(choice)
+	{
+	        case '1':
+	lcd_setcursor(0, 2);
+	lcd_print("System ARMING");
+	lcd_setcursor(1, 3);
+	lcd_print("You must leave ");
+	lcd_setcursor(3, 1);
+	lcd_print("Before the count");
+	lcd_setcursor(0, 0);
+	lcd_print("down is complete");
+	
+	unsigned char seg[5] = {0x49, 0x99, 0x0c, 0x25, 0x9f};
+	delay_milli(5000);	                                   //count 5 to 0.
+	break;
+			
+		case '2':
+	   void lcd_alarm_off(void);              //going to 'lcd_alarm_off' function. 
+	break;
+       }
+}while(choice == '1' || choice == '2');
+	
 }
