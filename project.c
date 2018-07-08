@@ -1,7 +1,7 @@
 /*
 	Title: MCO Final Project - Burglar Alarm System
 	Author: Kang, Minsing (147175160) 
-                Kim, Kun Eui (         )
+                Kim, Kun Eui (144719168)
 	Date: July ??, 2018
 	Description:	The program will emulate a BLODGERS HOME 
 					monitoring Burglar Alarm System. 
