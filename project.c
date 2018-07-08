@@ -341,7 +341,7 @@ void lcd_all_closed(void)
 	break;
 			
 		case '2':
-	   void lcd_alarm_off(void);              //going to 'lcd_alarm_off' function. 
+	        lcd_alarm_off();              //going to 'lcd_alarm_off' function. 
 	break;
        }
 }while(choice == '1' || choice == '2');
