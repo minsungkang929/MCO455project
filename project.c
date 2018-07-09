@@ -1,5 +1,5 @@
 /*
-	Title:		MCO Final Project - Burglar Alarm System
+	Title:		MCO455 Final Project - Burglar Alarm System
 	Author: 	Kang, Minsing (147175160) 
                 Kim, Kun Eui (144719168)
 	Date: 		July ??, 2018
@@ -17,7 +17,7 @@ void lcd_to_activate(void);
 void scr_alarm_status(unsigned char act);
 void scr_zone_sensor_status(void);
 void lcd_alarm_off(void);
-void lcd_staring(void);
+void lcd_starting(void);
 void lcd_pls_close(void);
 void lcd_still_open(void);
 void lcd_closed(void);
@@ -29,13 +29,13 @@ void scr_zone_sensor_status_clr(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "d:\library_de1.h"
+#include "f:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 // global variable
-unsigned char password[] = "1234";
+unsigned char password[] = "1234#";
 
 void main(void)
 {
@@ -54,87 +54,105 @@ void main(void)
 	do
 	{
 		scr_setcursor(10, 35);
-		choice = kb_getchar();
+		lcd_to_activate();		// display instruction to activate on LCD
+		while((choice=kb_getchar())== '\0');
 		switch(choice)
 		{
 			case '1':
 				do
 				{
-				scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
-				scr_zone_sensor_status();	// 	// display zone status
-				lcd_alarm_off();			// alarm off
-				while(SW_KEY1 != 0);		// wait for KEY1 to be pressed
-				lcd_staring();				// display starting on LCD
-				if(SWL != 0)				// check SWL up
-				{
-					lcd_pls_close();		// display massage on LCD
-					lcd_still_open();		// display SWL status on LCD
-					lcd_closed();			// display ARM or Cncl menu on LCD
-				}
-				else						// NO SWL up
-					lcd_closed();			// display ARM or Cncl menu on LCD
-				
-				for(;;)
-				{
-					if(SW_KEY2 == 0)		// if KEY2 is pressed
-						{
-						choice = 8;			// prepare to go back to Alarm off
-						break;
-						}
-					if(SW_KEY3 == 0)		// if KEY3 is pressed
+					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
+					lcd_alarm_off();			// alarm off
+					while(SW_KEY1 != 0) 		// wait for KEY1 to be pressed
 					{
-						choice = 9;			// prepare to arm
-						break;
-					}
-				}
-				if(choice == 9)				// prepare to arm
-					break;					// exit from do-while loop
-				} while (choice == 8);		// proceed do-while loop
-				
-				lcd_arming();				// arm windows and doors
-				while(SWL == 0);			// wait for SWL up
-				scr_local_alarm('1');		// local alarm: 1-ON / 2-OFF
-				
-				lcd_password();				// get password 1st try
-				
-				if(key_buff != password)		// if wrong password
-					lcd_password();			// get password 2nd try
-				
-				if(key_buff != password)		// if wrong password again
-				{
-					for(;;)
-					{
-						// system("COLOR 70");		// 7-white bg, 0-black font
-						system("COLOR 47");			// 4-red bg, 0-white font
-						scr_title();
-						scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
 						scr_zone_sensor_status();	// display zone status
-						scr_local_alarm('1');		// local alarm: 1-ON / 2-OFF
-						
-						LEDRL = 0xff;				// LED flash
-						delay_milli(500);			// with 0.5s delay
-						LEDRL = 0x00;				//
-						delay_milli(500);			//
-						
-						if(kb_getchar() == '3') // wait for 3 to reset
+						if(kb_getchar() == '4')
 						{
-							system("COLOR 70");			// 7-white bg, 0-black font
-							scr_title();
-							scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
-							scr_zone_sensor_status();	// display zone status
+							scr_alarm_status('2');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
+							scr_zone_sensor_status_clr();	// clr zone status
 							scr_local_alarm('2');		// local alarm: 1-ON / 2-OFF
+							choice = '4';
 							break;
 						}
 					}
-				}
-				else							// if correct password
+					if(choice != '4')
+					{
+						lcd_starting();				// display starting on LCD
+						if(SWL != 0)				// check SWL up
+						{
+							lcd_pls_close();		// display massage on LCD
+							lcd_still_open();		// display SWL status on LCD
+							lcd_closed();			// display ARM or Cncl menu on LCD
+						}
+						else						// NO SWL up
+							lcd_closed();			// display ARM or Cncl menu on LCD
+				
+						for(;;)
+						{
+							if(SW_KEY2 == 0)		// if KEY2 is pressed
+							{
+								choice = '8';			// prepare to go back to Alarm off
+								break;
+							}
+							if(SW_KEY3 == 0)		// if KEY3 is pressed
+							{
+								choice = '9';			// prepare to arm
+								break;
+							}
+						}
+						if(choice == '9')				// prepare to arm
+							break;					// exit from do-while loop
+					}
+				} while (choice == '8');		// proceed do-while loop
+				
+				if(choice != '4')
 				{
-					scr_local_alarm('2');		// local alarm: 1-ON / 2-OFF
-					scr_setcursor(18, 10);
-					scr_print("Password Accepted");
-					delay_milli(1000);
-					scr_setcursor(18, 10);
-					scr_print("                 ");
+					choice = '1';
+					lcd_arming();				// arm windows and doors
+					while(SWL == 0);			// wait for SWL up
+					scr_local_alarm('1');		// local alarm: 1-ON / 2-OFF
+				
+					lcd_password();				// get password 1st try
+				
+					if(strcmp(key_buff, password) == 0)		// if wrong password
+					lcd_password();			// get password 2nd try
+				
+					if(strcmp(key_buff, password) == 0)		// if wrong password again
+					{
+						for(;;)
+						{
+							// system("COLOR 70");		// 7-white bg, 0-black font
+							//system("COLOR 47");			// 4-red bg, 0-white font
+							scr_title();
+							scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
+							scr_zone_sensor_status();	// display zone status
+							scr_local_alarm('1');		// local alarm: 1-ON / 2-OFF
+						
+							LEDRL = 0xff;				// LED flash
+							delay_milli(500);			// with 0.5s delay
+							LEDRL = 0x00;				//
+							delay_milli(500);			//
+							
+								if(kb_getchar() == '3') // wait for 3 to reset
+								{
+									//system("COLOR 70");			// 7-white bg, 0-black font
+									scr_title();
+									scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 2-DeACTIVATE
+									scr_zone_sensor_status();	// display zone status
+									scr_local_alarm('2');		// local alarm: 1-ON / 2-OFF
+									break;
+								}
+							}
+						}
+					else							// if correct password
+					{
+						scr_local_alarm('2');		// local alarm: 1-ON / 2-OFF
+						scr_setcursor(18, 14);
+						scr_print("Password Accepted");
+						delay_milli(1000);
+						scr_setcursor(18, 14);
+						scr_print("                 ");
+					}
 				}
 				break;
 			
@@ -336,16 +354,16 @@ void lcd_alarm_off(void)
 	lcd_print("Push KEY1");
 }
 
-void lcd_staring(void)
+void lcd_starting(void)
 {
 	lcd_clear();
 	lcd_setcursor(0, 2);
 	lcd_print("Burglr Alarm");
 	lcd_setcursor(1, 4);
 	lcd_print("Start Up");
-	lcd_setcursor(3, 1);
+	lcd_setcursor(2, 1);
 	lcd_print("Checking STATUS");
-	lcd_setcursor(4, 3);
+	lcd_setcursor(3, 3);
 	lcd_print("Please Wait");
 	delay_milli(2500);
 }
@@ -357,7 +375,7 @@ void lcd_pls_close(void)
 	lcd_print("Please Close All");
 	lcd_setcursor(1, 3);
 	lcd_print("Windows and");
-	lcd_setcursor(3, 6);
+	lcd_setcursor(2, 6);
 	lcd_print("doors");
 	delay_milli(1000);
 }
@@ -452,17 +470,19 @@ void lcd_arming(void)
 		delay_milli(100);
 	
 		HEX1=0b11111110;
-		HEX3=0b11101100;
+		HEX3=0b11101110;
 		delay_milli(100);
 	
 		HEX3=0b11111110;
-		HEX2=0b11101100;
+		HEX2=0b11101110;
 		delay_milli(100);
 		
 		HEX2=0b11111110;
-		HEX1=0b11101100;
+		HEX1=0b11101110;
 		delay_milli(100);
 	
+		HEX1=0b11111110;
+		
 		if(count == 1)
 			HEX0 = 0b00001100;
 		else if(count == 2)
@@ -473,6 +493,7 @@ void lcd_arming(void)
 			HEX0 = 0b00000010;		
 	}
 	
+	lcd_clear();
 	lcd_setcursor(0, 2);
 	lcd_print("Burglar Alarm");
 	lcd_setcursor(1, 1);
@@ -481,6 +502,7 @@ void lcd_arming(void)
 	lcd_print("Checking Windows");
 	lcd_setcursor(3, 4);
 	lcd_print("and doors");
+	HEX0 = 0b11111111;
 }
 
 void scr_local_alarm(unsigned char act)
@@ -508,32 +530,49 @@ void lcd_password(void)
 	lcd_setcursor(2, 2);
 	lcd_print("to deactivate");
 	
-	scr_setcursor(18, 10);
+	scr_setcursor(18, 14);
 	scr_print("Password Pending");
 	
-	key_input(4, 3, 6, 0);			// 4 digits, row 3, col 6, show *
+	key_input(5, 3, 6, 0);			// 4 digits, row 3, col 6, show *
 }
 
 void lcd_new_password(void)
 {
-	volatile unsigned char choice;
+	//volatile unsigned char choice;
+	unsigned char choice[2];
+	unsigned char temppass[5];
 	do
 	{
 		lcd_clear();
 		lcd_setcursor(0, 2);
 		lcd_print("New Password");
 	
-		key_input(4, 1, 6, 1);		// 4 digits, row 1, col 6, show number
+		key_input(5, 1, 6, 1);		// 4 digits, row 1, col 6, show number
+		temppass[0] = key_buff[0];
+		temppass[1] = key_buff[1];
+		temppass[2] = key_buff[2];
+		temppass[3] = key_buff[3];
+		temppass[4] = key_buff[4];
 				
 		lcd_setcursor(2, 2);
 		lcd_print("OK=1, No=2");
 		
-		choice = get_key();		// get key from keypad
-		if(choice == '1')
+		//choice = get_key();		// get key from keypad
+		//choice = keypad();		// convert keypad value to ascii
+		key_input(2, 3, 6, 1);		// 4 digits, row 1, col 6, show number
+		choice[0] = key_buff[0];
+		choice[1] = key_buff[1];
+		
+		if(choice[0] == '1')
 		{
-			strcpy(password, key_buff);
+			//strcpy(password, temppass);
+			password[0] = temppass[0];
+			password[1] = temppass[1];
+			password[2] = temppass[2];
+			password[3] = temppass[3];
+			password[4] = temppass[4];
 		}
-	} while(choice != '1');
+	} while(choice[0] != '1');
 }
 
 void scr_zone_sensor_status_clr(void)
