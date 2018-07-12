@@ -636,5 +636,5 @@ void scr_zone_sensor_status_clr(void)
 void scr_choice(unsigned char choice)
 {
 	scr_setcursor(10, 35);
-	scr_print(choice);
+	scr_print(&choice);
 }
