@@ -36,7 +36,7 @@ void scr_choice(unsigned char choice);
 #include <stdlib.h>
 
 // global variable
-unsigned char password[4];
+unsigned char password[5];
 //volatile unsigned char alarm_status;
 volatile unsigned long SWL_temp;
 
@@ -47,11 +47,13 @@ void main(void)
 	SOPT_COPE = 0; /* disable COP */
 	LCD_ROWS=4;
 	LCD_COLS=16;
+	
+	// set initial password "1234#"
 	password[0] = '1';
 	password[1] = '2';
 	password[2] = '3';
 	password[3] = '4';
-	//password[4] = '#';
+	password[4] = '#';
 	
 	devices_init();			// initialize diveices
 	scr_title();			// display main menu on screen
@@ -69,7 +71,7 @@ void main(void)
 				{
 					scr_choice('1');			// display choice on screen
 					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
-					lcd_alarm_off();			// display "to turn on..." message
+					lcd_alarm_off();			// display "to turn on..." message on lcd
 					while(SW_KEY1 != 0) 		// wait for KEY1 to be pressed
 					{
 						scr_zone_sensor_status();	// display zone status
@@ -148,12 +150,24 @@ void main(void)
 									//scr_zone_sensor_status();	// display zone status on screen
 									break;
 								}
+								if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+									{ }								// do nothing
+								else
+								{
+								choice=SCI2D;						// store received character in variable
+									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+									{
+										scr_choice('4');				// display choice on screen
+										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+										scr_zone_sensor_status_clr();	// clear zone status
+										scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+										choice = '4';					// now menu choice is 4
+										break;							// break for loop
+									}
+								}
 							}
-						} while(SWL != 0);				// do-while loop for checking SWL down
-						
-						//if(choice == '9')			// prepare to arm
-							//break;					// exit from do-while loop
-					}
+						} while(SWL != 0 && choice != '4');				// do-while loop for checking SWL down
+					} // end of if(choice != '4' && choice != '2')
 					
 					if(choice != '4' && choice != '8' && choice != '2')	// if not 4, proceed to arm
 					{
@@ -179,7 +193,21 @@ void main(void)
 								LEDRL = 0x00;				//
 								delay_milli(500);			//
 												
-									if(kb_getchar() == '3') // wait for 3 to reset
+								if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+								{ }								// do nothing
+								else
+								{
+									choice=SCI2D;						// store received character in variable
+									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+									{
+										scr_choice('4');				// display choice on screen
+										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+										scr_zone_sensor_status_clr();	// clear zone status
+										scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+										//choice = '4';					// now menu choice is 4
+										break;							// break for loop
+									}
+									else if(choice == '3')
 									{
 										//scr_title();
 										scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
@@ -187,10 +215,23 @@ void main(void)
 										scr_local_alarm('0');		// local alarm: 1-ON / 0-OFF
 										scr_setcursor(18, 14);
 										scr_print("                 ");
-										break;						// break for-loop
+										break;						// break for loop
 									}
 								}
-							}
+								/*
+								if(kb_getchar() == '3') // wait for 3 to reset
+								{
+									//scr_title();
+									scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+									scr_zone_sensor_status();	// display zone status
+									scr_local_alarm('0');		// local alarm: 1-ON / 0-OFF
+									scr_setcursor(18, 14);
+									scr_print("                 ");
+									break;						// break for-loop
+								}
+								*/
+							}	// end of for loop
+						}	// end of if(strcmp(key_buff, password) != 0)
 						else							// if correct password
 						{
 							scr_local_alarm('0');		// local alarm: 1-ON / 0-OFF
@@ -200,12 +241,8 @@ void main(void)
 							scr_setcursor(18, 14);
 							scr_print("                 ");
 						}
-					}	
-					
-					
-				} while (choice == '8' || choice == '9' || choice == '2');		// proceed do-while loop to go back to "to turn on..."
-				
-				
+					}	// end of if(choice != '4' && choice != '8' && choice != '2')					
+				} while (choice == '8' || choice == '9' || choice == '2');		// proceed do-while loop to go back to "to turn on..."				
 				break;
 			
 			default:
@@ -627,17 +664,17 @@ void lcd_new_password(void)
 		lcd_setcursor(0, 2);
 		lcd_print("New Password");
 	
-		key_input(4, 1, 6, 1);		// 4 digits, row 1, col 6, show number
+		key_input(5, 1, 6, 1);		// 4 digits, row 1, col 6, show number
 		temppass[0] = key_buff[0];
 		temppass[1] = key_buff[1];
 		temppass[2] = key_buff[2];
 		temppass[3] = key_buff[3];
-		//temppass[4] = key_buff[4];
+		temppass[4] = key_buff[4];
 				
 		lcd_setcursor(2, 2);
 		lcd_print("OK=1, No=2");
 		
-		key_input(2, 3, 6, 1);		// 2 digits, row 1, col 6, show number
+		key_input(2, 3, 6, 1);		// 2 digits, row 3, col 6, show number
 		choice[0] = key_buff[0];
 		choice[1] = key_buff[1];
 		
@@ -647,7 +684,7 @@ void lcd_new_password(void)
 			password[1] = temppass[1];
 			password[2] = temppass[2];
 			password[3] = temppass[3];
-			//password[4] = temppass[4];
+			password[4] = temppass[4];
 		}
 	} while(choice[0] != '1');
 }
