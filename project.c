@@ -30,7 +30,7 @@ void scr_choice(unsigned char choice);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "f:\library_de1.h"
+#include "d:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -53,7 +53,7 @@ void main(void)
 	password[1] = '2';
 	password[2] = '3';
 	password[3] = '4';
-	password[4] = '#';
+	password[4] = '\0';
 	
 	devices_init();			// initialize diveices
 	scr_title();			// display main menu on screen
@@ -189,9 +189,10 @@ void main(void)
 								scr_zone_sensor_status();	// display zone status
 							
 								LEDRL = 0xff;				// LED flash
-								delay_milli(500);			// with 0.5s delay
+								delay_milli(250);			// with 0.5s delay
+								scr_zone_sensor_status();	// display zone status
 								LEDRL = 0x00;				//
-								delay_milli(500);			//
+								delay_milli(250);			//
 												
 								if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
 								{ }								// do nothing
@@ -204,7 +205,8 @@ void main(void)
 										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 										scr_zone_sensor_status_clr();	// clear zone status
 										scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
-										//choice = '4';					// now menu choice is 4
+										scr_setcursor(18, 14);
+										scr_print("                ");	// remove message "Password Pending"
 										break;							// break for loop
 									}
 									else if(choice == '3')
@@ -242,14 +244,14 @@ void main(void)
 							scr_print("                 ");
 						}
 					}	// end of if(choice != '4' && choice != '8' && choice != '2')					
-				} while (choice == '8' || choice == '9' || choice == '2');		// proceed do-while loop to go back to "to turn on..."				
+				} while (choice == '8' || choice == '9'|| choice == '3' || choice == '2' );		// proceed do-while loop to go back to "to turn on..."				
 				break;
 			
 			default:
 				scr_choice(choice);			// display choice on screen
 				scr_setcursor(11, 35);
 				scr_print("Unavailable!! Please activate system!!");
-				delay_milli(2000);
+				delay_milli(1500);
 				scr_setcursor(11, 35);
 				scr_print("                                      ");
 				break;
@@ -651,13 +653,13 @@ void lcd_password(void)
 	scr_setcursor(18, 14);
 	scr_print("Password Pending");
 	
-	key_input(4, 3, 6, 0);			// 4 digits, row 3, col 6, show *
+	key_input(5, 3, 6, 0);			// 4 digits, row 3, col 6, show *
 }
 
 void lcd_new_password(void)
 {
 	unsigned char choice[2];
-	unsigned char temppass[4];
+	unsigned char temppass[5];
 	do
 	{
 		lcd_clear();
