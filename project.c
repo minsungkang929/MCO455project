@@ -30,7 +30,7 @@ void scr_choice(unsigned char choice);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "d:\library_de1.h"
+#include "f:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -69,7 +69,8 @@ void main(void)
 			case '1':
 				do
 				{
-					scr_choice('1');			// display choice on screen
+					SWL_temp = (SWL + 1) << 1;
+					scr_choice(choice);			// display choice on screen
 					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 					lcd_alarm_off();			// display "to turn on..." message on lcd
 					while(SW_KEY1 != 0) 		// wait for KEY1 to be pressed
@@ -86,14 +87,14 @@ void main(void)
 								scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 								scr_zone_sensor_status_clr();	// clear zone status
 								scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
-								choice = '4';					// now menu choice is 4
+								//choice = '4';					// now menu choice is 4
 								break;							// break while loop
 							}
 							else if(choice == '2')
 							{
 								scr_choice('2');			// display choice on screen
 								lcd_new_password();			// function to change password
-								choice = '2';				// choice 8 means to stay in do-while loop
+								//choice = '2';				// choice 8 means to stay in do-while loop
 								break;						// break while loop
 							}
 							else if(choice == '3')
@@ -118,7 +119,7 @@ void main(void)
 							{}			// do nothing, go back to while loop
 						}
 					}
-					if(choice != '4' && choice != '2')	// if not 4,8, proceed to start up
+					if(choice != '4' && choice != '2')	// if not 4,2, proceed to start up
 					{
 						lcd_start_up();				// display start up on LCD
 						do
@@ -169,7 +170,8 @@ void main(void)
 						} while(SWL != 0 && choice != '4');				// do-while loop for checking SWL down
 					} // end of if(choice != '4' && choice != '2')
 					
-					if(choice != '4' && choice != '8' && choice != '2')	// if not 4, proceed to arm
+					//if(choice != '4' && choice != '8' && choice != '2')	// if not 4,8,2, proceed to arm
+					if(choice == '9')
 					{
 						//choice = '1';				// case choice is 1
 						lcd_arming();				// arm windows and doors
@@ -186,6 +188,7 @@ void main(void)
 						{
 							for(;;)
 							{
+								//scr_title();			// display main menu on screen
 								scr_zone_sensor_status();	// display zone status
 							
 								LEDRL = 0xff;				// LED flash
@@ -220,18 +223,6 @@ void main(void)
 										break;						// break for loop
 									}
 								}
-								/*
-								if(kb_getchar() == '3') // wait for 3 to reset
-								{
-									//scr_title();
-									scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
-									scr_zone_sensor_status();	// display zone status
-									scr_local_alarm('0');		// local alarm: 1-ON / 0-OFF
-									scr_setcursor(18, 14);
-									scr_print("                 ");
-									break;						// break for-loop
-								}
-								*/
 							}	// end of for loop
 						}	// end of if(strcmp(key_buff, password) != 0)
 						else							// if correct password
@@ -375,7 +366,7 @@ void scr_zone_sensor_status(void)
 	if(SW_SW0 == 0)		// ZONE 1
 	{
 		scr_setcursor(14, 52);
-		scr_print("CLOSED");
+		scr_print("2CLOSED");
 	}
 	else
 	{
@@ -666,7 +657,7 @@ void lcd_new_password(void)
 		lcd_setcursor(0, 2);
 		lcd_print("New Password");
 	
-		key_input(5, 1, 6, 1);		// 4 digits, row 1, col 6, show number
+		key_input(4, 1, 6, 1);		// 5 digits, row 1, col 6, show number
 		temppass[0] = key_buff[0];
 		temppass[1] = key_buff[1];
 		temppass[2] = key_buff[2];
@@ -676,7 +667,7 @@ void lcd_new_password(void)
 		lcd_setcursor(2, 2);
 		lcd_print("OK=1, No=2");
 		
-		key_input(2, 3, 6, 1);		// 2 digits, row 3, col 6, show number
+		key_input(1, 3, 6, 1);		// 2 digits, row 3, col 6, show number
 		choice[0] = key_buff[0];
 		choice[1] = key_buff[1];
 		
@@ -689,6 +680,7 @@ void lcd_new_password(void)
 			password[4] = temppass[4];
 		}
 	} while(choice[0] != '1');
+	//rewind(stdin);
 }
 
 void scr_zone_sensor_status_clr(void)
@@ -717,3 +709,6 @@ void scr_choice(unsigned char choice)
 	while(SCI2S1_TDRE == 0); //wait for TDRE=1
 	SCI2D= choice;			// print choice on screen
 }
+
+
+
