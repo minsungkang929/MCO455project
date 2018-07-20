@@ -83,7 +83,7 @@ void main(void)
 							choice=SCI2D;						// store received character in variable
 							if(choice == '4')				// if keyboard 4 is pressed, deactivate system
 							{
-								scr_choice('4');				// display choice on screen
+						        scr_choice(' ');				// display choice on screen
 								scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 								scr_zone_sensor_status_clr();	// clear zone status
 								scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
@@ -92,14 +92,14 @@ void main(void)
 							}
 							else if(choice == '2')
 							{
-								scr_choice('2');			// display choice on screen
+								//scr_choice('2');			// display choice on screen
 								lcd_new_password();			// function to change password
 								//choice = '2';				// choice 8 means to stay in do-while loop
 								break;						// break while loop
 							}
 							else if(choice == '3')
 							{
-								scr_choice(choice);			// display choice on screen
+								//scr_choice(choice);			// display choice on screen
 								scr_setcursor(11, 35);
 								scr_print("Unavailable!! Alarm is OFF!!");	// display error message
 								delay_milli(2000);
@@ -158,7 +158,7 @@ void main(void)
 								choice=SCI2D;						// store received character in variable
 									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
 									{
-										scr_choice('4');				// display choice on screen
+										scr_choice(' ');				// display choice on screen
 										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 										scr_zone_sensor_status_clr();	// clear zone status
 										scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
@@ -204,7 +204,7 @@ void main(void)
 									choice=SCI2D;						// store received character in variable
 									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
 									{
-										scr_choice('4');				// display choice on screen
+										scr_choice(' ');				// display choice on screen
 										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 										scr_zone_sensor_status_clr();	// clear zone status
 										scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
@@ -239,7 +239,7 @@ void main(void)
 				break;
 			
 			default:
-				scr_choice(choice);			// display choice on screen
+				//scr_choice(choice);			// display choice on screen
 				scr_setcursor(11, 35);
 				scr_print("Unavailable!! Please activate system!!");
 				delay_milli(1500);
@@ -362,95 +362,7 @@ void scr_zone_sensor_status(void)
 	}
 	scr_setcursor(10, 35);
 	
-	/*
-	if(SW_SW0 == 0)		// ZONE 1
-	{
-		scr_setcursor(14, 52);
-		scr_print("2CLOSED");
-	}
-	else
-	{
-		scr_setcursor(14, 52);
-		scr_print("OPEN  ");
-	}
 	
-	if(SW_SW1 == 0)		// ZONE 2
-		{
-			scr_setcursor(15, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(15, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW2 == 0)		// ZONE 3
-		{
-			scr_setcursor(16, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(16, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW3 == 0)		// ZONE 4
-		{
-			scr_setcursor(17, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(17, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW4 == 0)		// ZONE 5
-		{
-			scr_setcursor(18, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(18, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW5 == 0)		// ZONE 6
-		{
-			scr_setcursor(19, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(19, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW6 == 0)		// ZONE 7
-		{
-			scr_setcursor(20, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(20, 52);
-			scr_print("OPEN  ");
-		}
-	
-	if(SW_SW7 == 0)		// ZONE 8
-		{
-			scr_setcursor(21, 52);
-			scr_print("CLOSED");
-		}
-		else
-		{
-			scr_setcursor(21, 52);
-			scr_print("OPEN  ");
-		}
-		*/
 }
 
 void lcd_alarm_off(void)
@@ -607,8 +519,8 @@ void lcd_arming(void)
 	lcd_clear();
 	lcd_setcursor(0, 2);
 	lcd_print("Burglar Alarm");
-	lcd_setcursor(1, 1);
-	lcd_print("now ACTTIVATED");
+	lcd_setcursor(1, 2);
+	lcd_print("now ARMED!!");
 	lcd_setcursor(2, 0);
 	lcd_print("Checking Windows");
 	lcd_setcursor(3, 4);
