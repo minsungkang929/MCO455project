@@ -27,6 +27,7 @@ void lcd_password(void);
 void lcd_new_password(void);
 void scr_zone_sensor_status_clr(void);
 void scr_choice(unsigned char choice);
+//volatile unsigned char get_key(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
@@ -622,5 +623,89 @@ void scr_choice(unsigned char choice)
 	SCI2D= choice;			// print choice on screen
 }
 
-
-
+/*
+volatile unsigned char get_key(void) 
+{
+  volatile unsigned char dummy_key;
+  volatile unsigned char choice;
+   do 
+  {      
+     PTADD = 0xF0;                 
+// set PortA  ROWS to output and Columns to input
+     delay_micro(5);                  
+// wait for PORTA to change Data Direction
+     PTAD  = 0x00;                   
+// put 0 on ROWS and check columns 
+     dummy_key=PTAD;           
+// put Column value into dummy_key()
+     PTADD = 0x0F;                 
+// set PortA  Columns to output and Rows to  input
+     delay_micro(5);                  
+// wait for PORTA to change Data Direction
+     PTAD=0x00;                      
+// put 00 on Columns and check Rows
+     dummy_key=dummy_key + PTAD;  
+// key_value gets combined PORTA value
+     if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+     { }								// do nothing
+     else
+     {
+     	choice=SCI2D;						// store received character in variable
+     	if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+     	{
+     		scr_choice(' ');				// display choice on screen
+     		scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+     		scr_zone_sensor_status_clr();	// clear zone status
+     		scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+     		scr_setcursor(18, 14);
+     		scr_print("                ");	// remove message "Password Pending"
+     		break;							// break for loop
+     	}
+     }
+  }
+// keep doing till a keypress is detected, which happens if value in dummy_key is not FF
+  while (((dummy_key >> 4) != 0x0F)&& ((dummy_key & 0x0f)!= 0x0f));
+  delay_milli(20);               
+// wait for key to be debounced
+  do 
+  {      
+     PTADD = 0xF0;                 
+// set PortA  ROWS to output and Columns to input
+     delay_micro(5);                  
+// wait for PORTA to change Data Direction
+     PTAD  = 0x00;                   
+//  put 0 on ROWS and check columns 
+     key_value=PTAD;              
+// key_value gets Column value
+     PTADD = 0x0F;                 
+// set PortA  Columns to output and Rows to  input
+     delay_micro(5);                  
+// wait for PORTA to change Data Direction
+     PTAD=0x00;                      
+// put 00 on Columns and check Rows
+     key_value=key_value + PTAD;     
+// key_value gets total PORTA value  
+// keep going till result is not FX or XF
+     if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+          { }								// do nothing
+          else
+          {
+          	choice=SCI2D;						// store received character in variable
+          	if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+          	{
+          		scr_choice(' ');				// display choice on screen
+          		scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+          		scr_zone_sensor_status_clr();	// clear zone status
+          		scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+          		scr_setcursor(18, 14);
+          		scr_print("                ");	// remove message "Password Pending"
+          		break;							// break for loop
+          	}
+          }
+  } 
+//(valid keypress doesn’t have F as either digit.)
+  while (((key_value >> 4) == 0x0F) || ((key_value & 0x0f)== 0x0f)); 
+  return(key_value);                
+// return valid keypress
+}
+*/
