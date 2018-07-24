@@ -19,12 +19,12 @@ void scr_zone_sensor_status(void);
 void lcd_alarm_off(void);
 void lcd_start_up(void);
 void lcd_pls_close(void);
-void lcd_still_open(void);
+volatile unsigned char lcd_still_open(void);
 void lcd_closed(void);
 void lcd_arming(void);
 void scr_local_alarm(unsigned char act);
-void lcd_password(void);
-void lcd_new_password(void);
+volatile unsigned char lcd_password(void);
+volatile unsigned char lcd_new_password(void);
 void scr_zone_sensor_status_clr(void);
 void scr_choice(unsigned char choice);
 volatile unsigned char get_key(void);
@@ -72,7 +72,7 @@ void main(void)
 				do
 				{
 					SWL_temp = (SWL + 1) << 1;
-					scr_choice(choice);			// display choice on screen
+					scr_choice('1');			// display choice on screen
 					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 					lcd_alarm_off();			// display "to turn on..." message on lcd
 					while(SW_KEY1 != 0) 		// wait for KEY1 to be pressed
@@ -95,7 +95,8 @@ void main(void)
 							else if(choice == '2')
 							{
 								//scr_choice('2');			// display choice on screen
-								lcd_new_password();			// function to change password
+								choice = lcd_new_password();			// function to change password
+								scr_setcursor(10, 35);
 								//choice = '2';				// choice 8 means to stay in do-while loop
 								break;						// break while loop
 							}
@@ -129,7 +130,9 @@ void main(void)
 							if(SWL != 0)				// check SWL up
 							{
 								lcd_pls_close();		// display massage on LCD
-								lcd_still_open();		// display SWL status on LCD
+								choice = lcd_still_open();		// display SWL status on LCD
+								if(choice == '4')
+									break;
 								lcd_closed();			// display ARM or Cncl menu on LCD
 							}
 							else						// NO SWL up
@@ -181,10 +184,14 @@ void main(void)
 						while(SWL == 0);			// check for SWL up
 						
 						scr_local_alarm('1');		// local alarm: 1-ON / 0-OFF				
-						lcd_password();				// get password 1st try
+						choice = lcd_password();				// get password 1st try
+						if (choice == '4')
+							break;
 									
 						if(strcmp(key_buff, password) != 0)	// if wrong password for the 1st try
-						lcd_password();						// get password 2nd try
+						choice = lcd_password();						// get password 2nd try
+						if (choice == '4')
+							break;
 									
 						if(strcmp(key_buff, password) != 0)		// if wrong password again
 						{
@@ -404,9 +411,9 @@ void lcd_pls_close(void)
 	delay_milli(1000);
 }
 
-void lcd_still_open(void)
+volatile unsigned char lcd_still_open(void)
 {
-	volatile unsigned char mask, count, ccount;
+	volatile unsigned char choice, mask, count, ccount;
 	
 	lcd_clear();
 	lcd_setcursor(0, 2);
@@ -439,7 +446,24 @@ void lcd_still_open(void)
 			mask = mask >> 1;
 			--ccount;
 		}
+		if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+	    { }								// do nothing
+	    else
+	    {
+	    	choice=SCI2D;						// store received character in variable
+	    	if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+	    	{
+	    		scr_choice(' ');				// display choice on screen
+	    		scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+	    		scr_zone_sensor_status_clr();	// clear zone status
+	    		scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+	    		scr_setcursor(18, 14);
+	    		scr_print("                ");	// remove message "Password Pending"
+	    		return '4';
+	    	}
+	    }
 	}
+	return '1';
 }
 
 void lcd_closed(void)
@@ -545,9 +569,9 @@ void scr_local_alarm(unsigned char act)
 		
 }
 
-void lcd_password(void)
+volatile unsigned char lcd_password(void)
 {
-	unsigned char count, choice;
+	unsigned char count;
 	
 	lcd_clear();
 	lcd_setcursor(0, 1);
@@ -565,44 +589,28 @@ void lcd_password(void)
 	lcd_setcursor(3, 6);
 	for(count = 0 ; count < 5 ; ++count)
 	{
-		/*
-		if(count == 4)
-		{
-			do
-			{
-				key_buff[count] = get_key();
-				key_buff[count] = keypad();
-			} while(key_buff[count] != '#');
-			
-		} else{}
-		if(temppass[count] == '#')
-		{
-			break;
-		} else{}
-		*/
 		lcd_blink();
 		key_buff[count] = get_key();
+		if(key_buff[count] == 'x')
+		{
+			return '4';
+		} else{}
 		key_buff[count] = keypad();
 		key_buff[count+1] = '\0';
 		lcd_print("*");
 		count+=6;
 		lcd_setcursor(3, count+1);
 		count-=6;
-		if(key_buff[count] == 'x')
+		
+		if(password[count+1] == '\0')
 		{
-			choice = 4;
-			break;
-		} else{}
-		/*
-		if(key_buff[count] == '#')
-		{
-			break;
-		} else{}
-		*/
+			return '9';
+		}
 	}
+	return '9';
 }
 
-void lcd_new_password(void)
+volatile unsigned char lcd_new_password(void)
 {
 	unsigned char choice[3];
 	unsigned char temppass[6];
@@ -630,6 +638,11 @@ void lcd_new_password(void)
 				do
 				{
 					temppass[count] = get_key();
+					if(temppass[count] == 'x')
+					{
+						choice[0] = '4';
+						return '4';
+					} else{}
 					temppass[count] = keypad();
 					//temppass[count+1] = '\0';
 				} while(temppass[count] != '#');
@@ -642,29 +655,24 @@ void lcd_new_password(void)
 			} else{}
 			lcd_blink();
 			temppass[count] = get_key();
+			if(temppass[count] == 'x')
+			{
+				choice[0] = '4';
+				return '4';
+			} else{}
 			temppass[count] = keypad();
 			lcd_print("*");
 			count+=6;
 			lcd_setcursor(1, count+1);
 			count-=6;
-			if(temppass[count] == 'x')
-			{
-				choice[0] = '4';
-				break;
-			} else{}
+			
 			if(temppass[count] == '#')
 			{
 				temppass[count+1] = '\0';
 				break;
 			} else{}
 		}	// end of for loop
-		/*
-		temppass[0] = key_buff[0];
-		temppass[1] = key_buff[1];
-		temppass[2] = key_buff[2];
-		temppass[3] = key_buff[3];
-		temppass[4] = key_buff[4];
-		*/
+		
 		if(choice[0] != '4')
 		{
 			choice[0] = '0';
@@ -676,11 +684,16 @@ void lcd_new_password(void)
 			lcd_setcursor(3, 7);
 			for(count = 0 ; count < 2 ; ++count)
 			{
-				if(count == 2)
+				if(count == 1)
 				{
 					do
 					{
 						choice[count] = get_key();
+						if(choice[count] == 'x')
+						{
+							choice[0] = '4';
+							return '4';
+						} else{}
 						choice[count] = keypad();
 					} while(choice[count] != '#');
 					
@@ -689,27 +702,28 @@ void lcd_new_password(void)
 				{
 					break;
 				} else{}
+				
 				lcd_blink();
 				choice[count] = get_key();
+				
+				if(choice[count] == 'x')
+				{
+					choice[0] = '4';
+					return '4';
+				} else{}
+				
 				choice[count] = keypad();
 				lcd_print("*");
 				count+=7;
 				lcd_setcursor(3, count+1);
 				count-=7;
-				if(choice[count] == 'x')
-				{
-					choice[0] = '4';
-					break;
-				} else{}
+				
 				if(choice[count] == '#')
 				{
 					break;
 				} else{}
 			}	// end of for loop
 			
-			//choice[0] = key_buff[0];
-			//choice[1] = key_buff[1];
-		
 			if(choice[0] == '1')
 			{
 				password[0] = temppass[0];
@@ -721,7 +735,7 @@ void lcd_new_password(void)
 			}
 		}
 	} while(choice[0] != '1' && choice[0] != '4');
-	//rewind(stdin);
+	return '2';
 }
 
 void scr_zone_sensor_status_clr(void)
@@ -788,7 +802,6 @@ volatile unsigned char get_key(void)
      		scr_setcursor(18, 14);
      		scr_print("                ");	// remove message "Password Pending"
      		return 'x';
-     		break;							// break for loop
      	}
      }
   }
@@ -829,7 +842,6 @@ volatile unsigned char get_key(void)
           		scr_setcursor(18, 14);
           		scr_print("                ");	// remove message "Password Pending"
           		return 'x';
-          		break;							// break for loop
           	}
           }
   } 
