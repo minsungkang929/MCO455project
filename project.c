@@ -31,7 +31,7 @@ volatile unsigned char get_key(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "c:\library_de1.h"
+#include "f:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -55,7 +55,7 @@ void main(void)
 	password[2] = '3';
 	password[3] = '4';
 	password[4] = '#';
-	//password[5] = '\0';
+	password[5] = '\0';
 	
 	devices_init();			// initialize diveices
 	scr_title();			// display main menu on screen
@@ -583,6 +583,7 @@ void lcd_password(void)
 		lcd_blink();
 		key_buff[count] = get_key();
 		key_buff[count] = keypad();
+		key_buff[count+1] = '\0';
 		lcd_print("*");
 		count+=6;
 		lcd_setcursor(3, count+1);
@@ -630,11 +631,13 @@ void lcd_new_password(void)
 				{
 					temppass[count] = get_key();
 					temppass[count] = keypad();
+					//temppass[count+1] = '\0';
 				} while(temppass[count] != '#');
 				
 			} else{}
 			if(temppass[count] == '#')
 			{
+				temppass[count+1] = '\0';
 				break;
 			} else{}
 			lcd_blink();
@@ -651,6 +654,7 @@ void lcd_new_password(void)
 			} else{}
 			if(temppass[count] == '#')
 			{
+				temppass[count+1] = '\0';
 				break;
 			} else{}
 		}	// end of for loop
@@ -713,6 +717,7 @@ void lcd_new_password(void)
 				password[2] = temppass[2];
 				password[3] = temppass[3];
 				password[4] = temppass[4];
+				password[5] = temppass[5];
 			}
 		}
 	} while(choice[0] != '1' && choice[0] != '4');
