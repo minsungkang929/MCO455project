@@ -31,7 +31,7 @@ volatile unsigned char get_key(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "f:\library_de1.h"
+#include "d:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -196,9 +196,38 @@ void main(void)
 									
 						if(strcmp(key_buff, password) != 0)		// if wrong password again
 						{
+							// background color to RED
+							while((SCI2S1 & 0x80)!=0x80); 
+							SCI2D=0x1b;	// <ESC>
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x5b;	// [
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x34;	// 4
+							//while((SCI2S1 & 0x80)!=0x80);
+							//SCI2D=0x30;	// 0
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x31;	// 1
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x6d;	// m
+							
+							// foreground color to white
+							while((SCI2S1 & 0x80)!=0x80); 
+							SCI2D=0x1b;	// <ESC>
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x5b;	// [
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x33;	// 3
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x37;	// 7
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x6d;	// m
+							
+							scr_title();			// display main menu on screen
+							scr_local_alarm('1');	// local alarm: 1-ON / 0-OFF
+							SWL_temp = (SWL + 1) << 1;
+							
 							for(;;)
 							{
-								//scr_title();			// display main menu on screen
 								scr_zone_sensor_status();	// display zone status
 							
 								LEDRL = 0xff;				// LED flash
@@ -234,6 +263,33 @@ void main(void)
 									}
 								}
 							}	// end of for loop
+							
+							// background color to white
+							while((SCI2S1 & 0x80)!=0x80); 
+							SCI2D=0x1b;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x5b;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x34;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x37;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x6d;
+														
+							// foreground color to black
+							while((SCI2S1 & 0x80)!=0x80); 
+							SCI2D=0x1b;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x5b;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x33;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x30;
+							while((SCI2S1 & 0x80)!=0x80);
+							SCI2D=0x6d;
+							scr_title();			// display main menu on screen
+							scr_local_alarm('0');	// local alarm: 1-ON / 0-OFF
+							
 						}	// end of if(strcmp(key_buff, password) != 0)
 						else							// if correct password
 						{
@@ -363,8 +419,59 @@ void scr_zone_sensor_status(void)
 			}
 			else
 			{
+				
+				// background color to yellow
+											while((SCI2S1 & 0x80)!=0x80); 
+											SCI2D=0x1b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x5b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x34;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x33;
+											//while((SCI2S1 & 0x80)!=0x80);
+											//SCI2D=0x33;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x6d;
+																		
+											// foreground color to black
+											while((SCI2S1 & 0x80)!=0x80); 
+											SCI2D=0x1b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x5b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x33;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x30;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x6d;
+											
 				scr_setcursor(13+count, 52);
 				scr_print("OPEN  ");
+				
+				// background color to white
+											while((SCI2S1 & 0x80)!=0x80); 
+											SCI2D=0x1b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x5b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x34;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x37;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x6d;
+																		
+											// foreground color to black
+											while((SCI2S1 & 0x80)!=0x80); 
+											SCI2D=0x1b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x5b;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x33;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x30;
+											while((SCI2S1 & 0x80)!=0x80);
+											SCI2D=0x6d;
 			}
 			mask = mask << 1;
 		}
@@ -805,6 +912,7 @@ volatile unsigned char get_key(void)
      		return 'x';
      	}
      }
+     scr_zone_sensor_status();	// display zone status
   }
 // keep doing till a keypress is detected, which happens if value in dummy_key is not FF
   while (((dummy_key >> 4) != 0x0F)&& ((dummy_key & 0x0f)!= 0x0f));
@@ -845,6 +953,7 @@ volatile unsigned char get_key(void)
           		return 'x';
           	}
           }
+     scr_zone_sensor_status();	// display zone status
   } 
 //(valid keypress doesn’t have F as either digit.)
   while (((key_value >> 4) == 0x0F) || ((key_value & 0x0f)== 0x0f)); 
