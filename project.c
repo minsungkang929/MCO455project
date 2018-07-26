@@ -71,6 +71,7 @@ void main(void)
 			case '1':
 				do
 				{
+					choice = '1';
 					SWL_temp = (SWL + 1) << 1;
 					scr_choice('1');			// display choice on screen
 					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
@@ -94,7 +95,7 @@ void main(void)
 							}
 							else if(choice == '2')
 							{
-								//scr_choice('2');			// display choice on screen
+								scr_choice(' ');			// display choice on screen
 								choice = lcd_new_password();			// function to change password
 								scr_setcursor(10, 35);
 								//choice = '2';				// choice 8 means to stay in do-while loop
