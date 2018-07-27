@@ -1,4 +1,14 @@
 /*
+"I declare that the attached source code is wholly my own work in accordance with Seneca 
+Academic Policy. No part of this codehas been copied manually or electronically from any other 
+source (including web sites) or distributed to other students." 
+
+Name: Minsung Kang         Student ID: 147175160          Date: July 28, 2018                       
+Name: Kun Eui Kim		   Student ID: 144719168		  Date: July 28, 2018
+*/
+
+
+/*
 	Title:		MCO455 Final Project - Burglar Alarm System
 	Author: 	Kang, Minsing (147175160) 
                 Kim, Kun Eui (144719168)
@@ -31,7 +41,7 @@ volatile unsigned char get_key(void);
 
 #include <hidef.h> /* for EnableInterrupts macro */
 #include "derivative.h" /* include peripheral declarations */
-#include "d:\library_de1.h"
+#include "f:\library_de1.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -58,6 +68,30 @@ void main(void)
 	password[5] = '\0';
 	
 	devices_init();			// initialize diveices
+	
+	// background color to white
+	while((SCI2S1 & 0x80)!=0x80); 
+	SCI2D=0x1b;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x5b;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x34;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x37;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x6d;
+															
+	// foreground color to black
+	while((SCI2S1 & 0x80)!=0x80); 
+	SCI2D=0x1b;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x5b;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x33;
+	while((SCI2S1 & 0x80)!=0x80);
+	SCI2D=0x30;
+	while((SCI2S1 & 0x80)!=0x80);
+	
 	scr_title();			// display main menu on screen
 	for(;;)					// alarm system program have to always run
 	{
