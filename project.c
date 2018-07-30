@@ -3,8 +3,8 @@
 Academic Policy. No part of this codehas been copied manually or electronically from any other 
 source (including web sites) or distributed to other students." 
 
-Name: Minsung Kang         Student ID: 147175160          Date: July 28, 2018                       
-Name: Kun Eui Kim		   Student ID: 144719168		  Date: July 28, 2018
+Name: Minsung Kang         Student ID: 147175160          Date: July 30, 2018                       
+Name: Kun Eui Kim		   Student ID: 144719168		  Date: July 30, 2018
 */
 
 
@@ -12,7 +12,7 @@ Name: Kun Eui Kim		   Student ID: 144719168		  Date: July 28, 2018
 	Title:		MCO455 Final Project - Burglar Alarm System
 	Author: 	Kang, Minsing (147175160) 
                 Kim, Kun Eui (144719168)
-	Date: 		July ??, 2018
+	Date: 		July 30, 2018
 	Description:	The program will emulate a BLODGERS HOME 
 					monitoring Burglar Alarm System. 
 					The PC SCREEN and PC KEYBOARD will represent
@@ -48,7 +48,6 @@ volatile unsigned char get_key(void);
 
 // global variable
 unsigned char password[6];
-//volatile unsigned char alarm_status;
 volatile unsigned long SWL_temp;
 
 void main(void)
@@ -69,7 +68,7 @@ void main(void)
 	
 	devices_init();			// initialize diveices
 	
-	// background color to white
+	// background color to GREY
 	while((SCI2S1 & 0x80)!=0x80); 
 	SCI2D=0x1b;
 	while((SCI2S1 & 0x80)!=0x80);
@@ -81,7 +80,7 @@ void main(void)
 	while((SCI2S1 & 0x80)!=0x80);
 	SCI2D=0x6d;
 															
-	// foreground color to black
+	// foreground color to BLACK
 	while((SCI2S1 & 0x80)!=0x80); 
 	SCI2D=0x1b;
 	while((SCI2S1 & 0x80)!=0x80);
@@ -93,60 +92,59 @@ void main(void)
 	while((SCI2S1 & 0x80)!=0x80);
 	
 	scr_title();			// display main menu on screen
-	for(;;)					// alarm system program have to always run
+	for(;;)					// alarm system program have to always run using for-loop
 	{
 		scr_alarm_status('0');	// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 		scr_local_alarm('0');	// local alarm: 1-ON / 0-OFF
 		lcd_to_activate();		// display instruction to activate on LCD
 		scr_setcursor(10, 35);
-		while((choice=kb_getchar())== '\0');	// wait for menu selection
+		while((choice=kb_getchar())== '\0');	// wait for user input to select menu
 		switch(choice)
 		{
-			case '1':
+			case '1':	// 1.   ENABLE BURGLAR ALARM
 				do
 				{
 					choice = '1';
-					SWL_temp = (SWL + 1) << 1;
+					SWL_temp = (SWL + 1) << 1;	//change SWL_temp value in different value with SWL to update ALARM STATUS 
 					scr_choice('1');			// display choice on screen
 					scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 					lcd_alarm_off();			// display "to turn on..." message on lcd
+					
 					while(SW_KEY1 != 0) 		// wait for KEY1 to be pressed
 					{
-						scr_zone_sensor_status();	// display zone status
+						scr_zone_sensor_status();		// display zone status
 						if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
 						{ }								// do nothing
 						else
 						{
-							choice=SCI2D;						// store received character in variable
-							if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+							choice=SCI2D;			// store received character in variable
+							if(choice == '4')		// 4.   DeACTIVATE ALARM
 							{
 						        scr_choice(' ');				// display choice on screen
 								scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 								scr_zone_sensor_status_clr();	// clear zone status
 								scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
-								//choice = '4';					// now menu choice is 4
 								break;							// break while loop
 							}
-							else if(choice == '2')
+							else if(choice == '2')	// 2.   RESET PASSWORD
 							{
-								scr_choice(' ');			// display choice on screen
-								choice = lcd_new_password();			// function to change password
+								scr_choice(' ');				// display choice on screen
+								choice = lcd_new_password();	// function to change password
 								scr_setcursor(10, 35);
-								//choice = '2';				// choice 8 means to stay in do-while loop
-								break;						// break while loop
+								break;							// break while loop
 							}
-							else if(choice == '3')
+							else if(choice == '3')	// 3.   RESET ALARM
 							{
-								//scr_choice(choice);			// display choice on screen
+								scr_choice(' ');							// display choice on screen
 								scr_setcursor(11, 35);
 								scr_print("Unavailable!! Alarm is OFF!!");	// display error message
 								delay_milli(2000);
 								scr_setcursor(11, 35);
 								scr_print("                            ");	// remove error message
 							}
-							else if(choice == '1')
+							else if(choice == '1')	// 1.   ENABLE BURGLAR ALARM
 							{
-								scr_choice(choice);			// display choice on screen
+								scr_choice(' ');											// display choice on screen
 								scr_setcursor(11, 35);
 								scr_print("Unavailable!! System is already activated!!");	// display error message
 								delay_milli(2000);
@@ -155,8 +153,9 @@ void main(void)
 														}
 							else
 							{}			// do nothing, go back to while loop
-						}
-					}
+						}	// end of if-else
+					}	// end of while(SW_KEY1 != 0)
+					
 					if(choice != '4' && choice != '2')	// if not 4,2, proceed to start up
 					{
 						lcd_start_up();				// display start up on LCD
@@ -164,9 +163,9 @@ void main(void)
 						{
 							if(SWL != 0)				// check SWL up
 							{
-								lcd_pls_close();		// display massage on LCD
-								choice = lcd_still_open();		// display SWL status on LCD
-								if(choice == '4')
+								lcd_pls_close();			// display massage on LCD
+								choice = lcd_still_open();	// display SWL status on LCD
+								if(choice == '4')			// if 4, break and go to deactivate
 									break;
 								lcd_closed();			// display ARM or Cncl menu on LCD
 							}
@@ -188,14 +187,13 @@ void main(void)
 								}
 								if(SWL != 0)			// if SWL up, go back to check SWL
 								{
-									//scr_zone_sensor_status();	// display zone status on screen
 									break;
 								}
 								if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
-									{ }								// do nothing
+								{ }								// do nothing
 								else
 								{
-								choice=SCI2D;						// store received character in variable
+									choice=SCI2D;					// store received character in variable
 									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
 									{
 										scr_choice(' ');				// display choice on screen
@@ -206,30 +204,54 @@ void main(void)
 										break;							// break for loop
 									}
 								}
-							}
+							}	// end of for-loop
 						} while(SWL != 0 && choice != '4');				// do-while loop for checking SWL down
 					} // end of if(choice != '4' && choice != '2')
 					
-					//if(choice != '4' && choice != '8' && choice != '2')	// if not 4,8,2, proceed to arm
-					if(choice == '9')
+					if(choice == '9')	// start arming
 					{
-						//choice = '1';				// case choice is 1
 						lcd_arming();				// arm windows and doors
 						
-						while(SWL == 0);			// check for SWL up
+						//while(SWL == 0);			// check for SWL up
+						for(;;)	// sense SWL up of key 4 pressed
+						{
+							if(SWL != 0)			// if SWL up, break to check password
+							{
+								break;
+							}
+							if (( SCI2S1 & 0x20) != 0x20)	// check if receiver has no character
+							{ }								// do nothing
+							else
+							{
+								choice=SCI2D;					// store received character in variable
+								if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+								{
+									scr_choice(' ');				// display choice on screen
+									scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
+									scr_zone_sensor_status_clr();	// clear zone status
+									scr_local_alarm('0');			// local alarm: 1-ON / 0-OFF
+									choice = '4';					// now menu choice is 4
+									break;							// break for loop
+								}
+							}
+						}	// end of for-loop
+						if (choice == '4')	// if key 4, break loop to deactivate
+							break;
 						
+						// since SWL up, set alarm on and check password
 						scr_local_alarm('1');		// local alarm: 1-ON / 0-OFF				
-						choice = lcd_password();				// get password 1st try
-						if (choice == '4')
+						choice = lcd_password();	// get password 1st try
+						if (choice == '4')	// if key 4, break loop to deactivate
 							break;
 									
 						if(strcmp(key_buff, password) != 0)	// if wrong password for the 1st try
-						choice = lcd_password();						// get password 2nd try
-						if (choice == '4')
+							choice = lcd_password();		// get password 2nd try
+						if (choice == '4')	// if key 4, break loop to deactivate
 							break;
 									
 						if(strcmp(key_buff, password) != 0)		// if wrong password again
 						{
+							// change font color on screen to alert!!
 							// background color to RED
 							while((SCI2S1 & 0x80)!=0x80); 
 							SCI2D=0x1b;	// <ESC>
@@ -237,8 +259,6 @@ void main(void)
 							SCI2D=0x5b;	// [
 							while((SCI2S1 & 0x80)!=0x80);
 							SCI2D=0x34;	// 4
-							//while((SCI2S1 & 0x80)!=0x80);
-							//SCI2D=0x30;	// 0
 							while((SCI2S1 & 0x80)!=0x80);
 							SCI2D=0x31;	// 1
 							while((SCI2S1 & 0x80)!=0x80);
@@ -256,10 +276,11 @@ void main(void)
 							while((SCI2S1 & 0x80)!=0x80);
 							SCI2D=0x6d;	// m
 							
-							scr_title();			// display main menu on screen
-							scr_local_alarm('1');	// local alarm: 1-ON / 0-OFF
-							SWL_temp = (SWL + 1) << 1;
+							scr_title();				// display main menu on screen with new color
+							scr_local_alarm('1');		// local alarm: 1-ON / 0-OFF
+							SWL_temp = (SWL + 1) << 1;	//change SWL_temp value in different value with SWL to update ALARM STATUS
 							
+							// LED flash because of an intruder
 							for(;;)
 							{
 								scr_zone_sensor_status();	// display zone status
@@ -274,8 +295,8 @@ void main(void)
 								{ }								// do nothing
 								else
 								{
-									choice=SCI2D;						// store received character in variable
-									if(choice == '4')				// if keyboard 4 is pressed, deactivate system
+									choice=SCI2D;		// store received character in variable
+									if(choice == '4')	// 4.   DeACTIVATE ALARM
 									{
 										scr_choice(' ');				// display choice on screen
 										scr_alarm_status('0');			// alarm status: 1- ACTIVATE / 0-DeACTIVATE
@@ -285,9 +306,8 @@ void main(void)
 										scr_print("                ");	// remove message "Password Pending"
 										break;							// break for loop
 									}
-									else if(choice == '3')
+									else if(choice == '3')	// 3.   RESET ALARM
 									{
-										//scr_title();
 										scr_alarm_status('1');		// alarm status: 1- ACTIVATE / 0-DeACTIVATE
 										scr_zone_sensor_status();	// display zone status
 										scr_local_alarm('0');		// local alarm: 1-ON / 0-OFF
@@ -298,7 +318,8 @@ void main(void)
 								}
 							}	// end of for loop
 							
-							// background color to white
+							// change font color for normal status
+							// background color to GREY
 							while((SCI2S1 & 0x80)!=0x80); 
 							SCI2D=0x1b;
 							while((SCI2S1 & 0x80)!=0x80);
@@ -310,7 +331,7 @@ void main(void)
 							while((SCI2S1 & 0x80)!=0x80);
 							SCI2D=0x6d;
 														
-							// foreground color to black
+							// foreground color to BLACK
 							while((SCI2S1 & 0x80)!=0x80); 
 							SCI2D=0x1b;
 							while((SCI2S1 & 0x80)!=0x80);
@@ -321,9 +342,9 @@ void main(void)
 							SCI2D=0x30;
 							while((SCI2S1 & 0x80)!=0x80);
 							SCI2D=0x6d;
-							scr_title();			// display main menu on screen
-							scr_local_alarm('0');	// local alarm: 1-ON / 0-OFF
 							
+							scr_title();			// display main menu on screen with new color
+							scr_local_alarm('0');	// local alarm: 1-ON / 0-OFF							
 						}	// end of if(strcmp(key_buff, password) != 0)
 						else							// if correct password
 						{
@@ -339,7 +360,6 @@ void main(void)
 				break;
 			
 			default:
-				//scr_choice(choice);			// display choice on screen
 				scr_setcursor(11, 35);
 				scr_print("Unavailable!! Please activate system!!");
 				delay_milli(1500);
@@ -351,6 +371,10 @@ void main(void)
 }			// end of main
 
 // function definitions
+
+/*
+  to display title on screen
+*/
 void scr_title(void)
 {
 	scr_clear();		// clear screen
@@ -373,13 +397,9 @@ void scr_title(void)
   
 	scr_setcursor(12, 17);
 	scr_print("ALARM STATUS");
-	//scr_setcursor(13, 17);
-	//scr_print("DeACTIVATED");
   
 	scr_setcursor(15, 17);
 	scr_print("Local Alarm");
-	//scr_setcursor(16, 22);
-	//scr_print("OFF");
   
 	scr_setcursor(12, 40);
 	scr_print("ZONE Sensor STATUS");
@@ -403,6 +423,9 @@ void scr_title(void)
 	scr_setcursor(10, 35);
 }
 
+/*
+ 	 to show instruction on lcd for users to activate
+*/ 
 void lcd_to_activate(void)
 {
 	lcd_clear();
@@ -416,28 +439,26 @@ void lcd_to_activate(void)
 
 /*
  	 to write alarm status on screen
- 	 parameter 1 means activate
- */
+ 	 1 = activate / 0 = deactivate
+*/
 void scr_alarm_status(unsigned char act)
 {
 	if(act == '1')
 	{
 		scr_setcursor(13, 17);
 		scr_print("ACTIVATED  ");
-		//alarm_stauts = 1;
 	}
 	else
 	{
 		scr_setcursor(13, 17);
 		scr_print("DeACTIVATED");
-		//alarm_stauts = 0;
 	}
 	scr_setcursor(10, 35);
 }
 
 /*	
  	 to read SWL value and display the value on screen 
- */
+*/
 void scr_zone_sensor_status(void)
 {
 	volatile unsigned char mask, count;
@@ -454,68 +475,69 @@ void scr_zone_sensor_status(void)
 			else
 			{
 				
+				// change font color to identify SWL status easily
 				// background color to yellow
-											while((SCI2S1 & 0x80)!=0x80); 
-											SCI2D=0x1b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x5b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x34;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x33;
-											//while((SCI2S1 & 0x80)!=0x80);
-											//SCI2D=0x33;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x6d;
-																		
-											// foreground color to black
-											while((SCI2S1 & 0x80)!=0x80); 
-											SCI2D=0x1b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x5b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x33;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x30;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x6d;
+				while((SCI2S1 & 0x80)!=0x80); 
+				SCI2D=0x1b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x5b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x34;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x33;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x6d;
+															
+				// foreground color to black
+				while((SCI2S1 & 0x80)!=0x80); 
+				SCI2D=0x1b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x5b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x33;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x30;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x6d;
 											
 				scr_setcursor(13+count, 52);
 				scr_print("OPEN  ");
 				
+				// change font color for normal status
 				// background color to white
-											while((SCI2S1 & 0x80)!=0x80); 
-											SCI2D=0x1b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x5b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x34;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x37;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x6d;
-																		
-											// foreground color to black
-											while((SCI2S1 & 0x80)!=0x80); 
-											SCI2D=0x1b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x5b;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x33;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x30;
-											while((SCI2S1 & 0x80)!=0x80);
-											SCI2D=0x6d;
+				while((SCI2S1 & 0x80)!=0x80); 
+				SCI2D=0x1b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x5b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x34;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x37;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x6d;
+												
+				// foreground color to black
+				while((SCI2S1 & 0x80)!=0x80); 
+				SCI2D=0x1b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x5b;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x33;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x30;
+				while((SCI2S1 & 0x80)!=0x80);
+				SCI2D=0x6d;
 			}
 			mask = mask << 1;
 		}
 		SWL_temp = SWL;
 	}
-	scr_setcursor(10, 35);
-	
-	
+	scr_setcursor(10, 35);	
 }
 
+/*
+ 	 to display instruction to turn on alarm on lcd
+*/
 void lcd_alarm_off(void)
 {
 	lcd_clear();
@@ -527,6 +549,9 @@ void lcd_alarm_off(void)
 	lcd_print("Push KEY1");
 }
 
+/*
+ 	 to dispay checking status message and wait for 2.5sec
+*/
 void lcd_start_up(void)
 {
 	lcd_clear();
@@ -541,6 +566,9 @@ void lcd_start_up(void)
 	delay_milli(2500);
 }
 
+/*
+ 	 to write instruction on lcd to close windows and doors
+*/
 void lcd_pls_close(void)
 {
 	lcd_clear();
@@ -553,6 +581,11 @@ void lcd_pls_close(void)
 	delay_milli(1000);
 }
 
+/*
+ 	 to display windows and door status on lcd
+ 	 if all windows are closed, return 1 to proceed next step
+ 	 if keyboard 4 is pressed, return 4 to indicate deactivate
+*/
 volatile unsigned char lcd_still_open(void)
 {
 	volatile unsigned char choice, mask, count, ccount;
@@ -608,6 +641,9 @@ volatile unsigned char lcd_still_open(void)
 	return '1';
 }
 
+/*
+ 	 to display instruction for next step on lcd
+*/
 void lcd_closed(void)
 {
 	lcd_clear();
@@ -621,6 +657,10 @@ void lcd_closed(void)
 	lcd_print("KY3=ARM,KY2=Cncl");
 }
 
+/*
+ 	 to display arming message on lcd and count down 3 to 1
+ 	 after that, display armed message
+*/
 void lcd_arming(void)
 {
 	volatile unsigned char count;
@@ -696,6 +736,10 @@ void lcd_arming(void)
 	HEX0 = 0b11111111;
 }
 
+/*
+ 	 to write local alarm status on screen
+ 	 1 = ON / 0 = OFF
+*/
 void scr_local_alarm(unsigned char act)
 {
 	if(act == '1')
@@ -711,6 +755,11 @@ void scr_local_alarm(unsigned char act)
 		
 }
 
+/*
+ 	 to get password using keypad
+ 	 if get password from user, return 9 to proceed next step
+ 	 if keyboard 4 is pressed, return 4 to deactivate
+*/
 volatile unsigned char lcd_password(void)
 {
 	unsigned char count;
@@ -726,7 +775,6 @@ volatile unsigned char lcd_password(void)
 	scr_setcursor(18, 14);
 	scr_print("Password Pending");
 	
-	//key_input(5, 3, 6, 0);			// 4 digits, row 3, col 6, show *
 	
 	lcd_setcursor(3, 6);
 	for(count = 0 ; count < 5 ; ++count)
@@ -752,13 +800,17 @@ volatile unsigned char lcd_password(void)
 	return '9';
 }
 
+/*
+ 	 to change password using keypad
+ 	 password has max.4 digit + # in the end.
+ 	 if new password set is success, return 2 to proceed next step
+ 	 if keyboard 4 is pressed, return 4 to deactivate
+*/
 volatile unsigned char lcd_new_password(void)
 {
 	unsigned char choice[3];
 	unsigned char temppass[6];
 	unsigned char count;
-	
-	
 	
 	do
 	{
@@ -786,7 +838,6 @@ volatile unsigned char lcd_new_password(void)
 						return '4';
 					} else{}
 					temppass[count] = keypad();
-					//temppass[count+1] = '\0';
 				} while(temppass[count] != '#');
 				
 			} else{}
@@ -880,6 +931,9 @@ volatile unsigned char lcd_new_password(void)
 	return '2';
 }
 
+/*
+ 	 to remove alarm status on screen
+*/
 void scr_zone_sensor_status_clr(void)
 {
 	scr_setcursor(14, 52);
@@ -900,6 +954,9 @@ void scr_zone_sensor_status_clr(void)
 	scr_print("      ");
 }
 
+/*
+ 	 to write user choice on screen
+*/
 void scr_choice(unsigned char choice)
 {
 	scr_setcursor(10, 35);
@@ -907,7 +964,11 @@ void scr_choice(unsigned char choice)
 	SCI2D= choice;			// print choice on screen
 }
 
-
+/*
+ 	 to get key using keypad
+ 	 if keypad is pressed, return variable key_value
+ 	 if keyboard 4 is pressed, return x to indicate deactivate
+*/
 volatile unsigned char get_key(void) 
 {
   volatile unsigned char dummy_key;
